@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+    <div id="message"></div>
+    <script type="text/javascript">
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        window.onload = function() {
+            // Get a reference to the div on the page that will display the
+            // message text.
+            var messageEle = document.getElementById('message');
+
+            // A function to process messages received by the window.
+            async function receiveMessage(e) {
+                // Check to make sure that this message came from the correct domain.
+                if (e.origin !== "http://localhost:5000")
+                return;
+
+                // Update the div element to display the message.
+                messageEle.innerHTML = "Message Received: " + e.data;
+                if (e.data == null) {
+                    await sleep(5000)
+                    window.location.replace(e.origin + "/public/index.html?client=tms&path=/")
+                }
+
+                let auth = JSON.parse(e.data)
+                sessionStorage.setItem('token', auth.token)
+            }
+
+            let stoken = sessionStorage.getItem('token')
+            if (stoken != null) {
+                messageEle.innerHTML = "Token: " + stoken;
+                return
+            }
+
+            let token = window.location.search.replace("?token=", "")
+            if (token != "") {
+                messageEle.innerHTML = "Token: " + token;
+                sessionStorage.setItem('token', token)
+                let basepath = window.location.href.replace(window.location.search, "")
+                window.location.replace(basepath)
+            } else  window.addEventListener('message', receiveMessage);
+           
+        }
+
+    </script>
+    <iframe src="http://localhost:5000/public/auth.html?client=tms" width="0" height="0">
+        <p>Your browser does not support iframes.</p>
+    </iframe>
+</body>
+</html>

@@ -1,0 +1,3 @@
+FROM sicepat/dsvc
+
+COPY --chown=svc:svc ./index.html /index.html
