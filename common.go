@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -59,6 +60,16 @@ func CompressFile(output string, paths, arpaths []string) error {
 		}
 	}
 	return nil
+}
+
+func hash(obj interface{}) [32]byte {
+	val := fmt.Sprintf("%v", obj)
+	return sha256.Sum256([]byte(val))
+}
+
+func hash64(obj interface{}) string {
+	b := hash(obj)
+	return base64.StdEncoding.EncodeToString(b[:])
 }
 
 //HashFile calculate file hash

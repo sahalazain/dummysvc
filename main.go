@@ -42,6 +42,16 @@ func main() {
 	})
 
 	e.GET("/menu/bundle", serveBundle)
+	e.GET("/menu", func(c echo.Context) error {
+		hash := hash64(menu)
+		etag := c.Request().Header.Get("If-None-Match")
+		if etag == hash {
+			return c.NoContent(http.StatusNotModified)
+		}
+
+		c.Response().Header().Set("Etag", hash)
+		return c.JSON(http.StatusOK, menu)
+	})
 
 	e.GET("/", func(c echo.Context) error {
 		return c.File("index.html")
